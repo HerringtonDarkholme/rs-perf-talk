@@ -43,6 +43,12 @@ The last comment block of each slide will be treated as slide notes. It will be 
 ---
 transition: fade
 layout: image
+image: /splash-white.png
+---
+
+---
+transition: fade
+layout: image
 image: /splash.png
 ---
 
@@ -54,20 +60,13 @@ transition: fade-out
 
 **Rust** is rapidly becoming a language of choice within the JavaScript ecosystem
 
-- **Rspack** -
-- **Biome** -
-- **Oxc** -
-- **Lightening CSS** -
-- **Turbopack** -
-- **Rolldown** -
-
-<br>
-<br>
-
-<!--
-You can have `style` tag in markdown to override the style for the current page.
-Learn more: https://sli.dev/guide/syntax#embedded-styles
--->
+- **Rspack** - Webpack
+- **Biome** - Prettier/Eslint
+- **Swc** - Babel
+- **Oxc** - Babel/Eslint
+- **Lightening CSS** - PostCSS
+- **Rolldown** - Rollup
+- **Turbopack** - For Next.js
 
 <style>
 h1 {
@@ -89,40 +88,31 @@ Here is another comment.
 layout: default
 ---
 
-# Table of contents
+# Why Rust?
 
-```html
-<Toc minDepth="1" maxDepth="1"></Toc>
-```
+<v-clicks>
 
-<Toc maxDepth="1"></Toc>
+- ### Peak Performance
+  - Compiler Optimization
+  - Compact Data Layout
+  - Multiple Threads
+  - Powerful Hardware Intrinsics, e.g. SIMD
+- ### Predictable Performance
+  - No Garbage Collection
+  - No JIT deoptimization
+- ### Ecosystem
+  - cargo toolchain is amazing
+  - napi.rs is goat
+
+</v-clicks>
 
 ---
 transition: slide-up
 level: 2
 ---
 
-# Navigation
+# Why Not Rust?
 
-Hover on the bottom-left corner to see the navigation's controls panel, [learn more](https://sli.dev/guide/navigation.html)
-
-## Keyboard Shortcuts
-
-|     |     |
-| --- | --- |
-| <kbd>right</kbd> / <kbd>space</kbd>| next animation or slide |
-| <kbd>left</kbd>  / <kbd>shift</kbd><kbd>space</kbd> | previous animation or slide |
-| <kbd>up</kbd> | previous slide |
-| <kbd>down</kbd> | next slide |
-
-<!-- https://sli.dev/guide/animations.html#click-animations -->
-<img
-  v-click
-  class="absolute -bottom-9 -left-7 w-80 opacity-50"
-  src="https://sli.dev/assets/arrow-bottom-left.svg"
-  alt=""
-/>
-<p v-after class="absolute bottom-23 left-45 opacity-30 transform -rotate-10">Here!</p>
 
 ---
 layout: image-right
@@ -191,7 +181,7 @@ Check out [the guides](https://sli.dev/builtin/components.html) for more.
 <Tweet id="1390115482657726468" />
 ```
 
-<Tweet id="1390115482657726468" scale="0.65" />
+<Tweet v-click id="1390115482657726468" />
 
 </div>
 </div>
