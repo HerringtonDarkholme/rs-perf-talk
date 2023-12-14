@@ -1,24 +1,24 @@
 ---
 theme: seriph
-background: https://source.unsplash.com/collection/94734566/1920x1080
+background: /background.avif
 class: text-center
 highlighter: shiki
 lineNumbers: false
 info: |
-  ## Slidev Starter Template
+  ## Rust Performance in JavaScript
   Presentation slides for developers.
 
   Learn more at [Sli.dev](https://sli.dev)
 drawings:
   persist: false
-transition: slide-left
-title: Welcome to Slidev
+transition: fade
+title: Benchmark Rusty Parsers
 mdc: true
 ---
 
-# Welcome to Slidev
+# Benchmark Rusty Parsers
 
-Presentation slides for developers
+Demystify Native Tooling Performance in JavaScript
 
 <div class="pt-12">
   <span @click="$slidev.nav.next" class="px-2 py-1 rounded cursor-pointer" hover="bg-white bg-opacity-10">
@@ -41,25 +41,28 @@ The last comment block of each slide will be treated as slide notes. It will be 
 -->
 
 ---
+transition: fade
+layout: image
+image: /splash.png
+---
+
+---
 transition: fade-out
 ---
 
-# What is Slidev?
+# Rust in JavaScript
 
-Slidev is a slides maker and presenter designed for developers, consist of the following features
+**Rust** is rapidly becoming a language of choice within the JavaScript ecosystem
 
-- 📝 **Text-based** - focus on the content with Markdown, and then style them later
-- 🎨 **Themable** - theme can be shared and used with npm packages
-- 🧑‍💻 **Developer Friendly** - code highlighting, live coding with autocompletion
-- 🤹 **Interactive** - embedding Vue components to enhance your expressions
-- 🎥 **Recording** - built-in recording and camera view
-- 📤 **Portable** - export into PDF, PNGs, or even a hostable SPA
-- 🛠 **Hackable** - anything possible on a webpage
+- **Rspack** -
+- **Biome** -
+- **Oxc** -
+- **Lightening CSS** -
+- **Turbopack** -
+- **Rolldown** -
 
 <br>
 <br>
-
-Read more about [Why Slidev?](https://sli.dev/guide/why)
 
 <!--
 You can have `style` tag in markdown to override the style for the current page.
