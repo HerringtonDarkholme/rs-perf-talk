@@ -93,8 +93,8 @@ layout: default
 <v-clicks>
 
 - ### Peak Performance
-  - Compiler Optimization
-  - Compact Data Layout
+  - Better Compiler Optimization
+  - Compact Data Layout: less cache miss / fewer instructions
   - Multiple Threads
   - Powerful Hardware Intrinsics, e.g. SIMD
 - ### Predictable Performance
@@ -111,8 +111,79 @@ transition: slide-up
 level: 2
 ---
 
-# Why Not Rust?
+# Why Not Rust Plugins?
 
+<div grid="~ cols-2 gap-4">
+<div>
+
+Designing an efficient and portable plugin system.
+
+<v-clicks>
+
+- ## Learning Curve
+  - Lifetime
+  - Borrow Checker
+  - Unsafe Rust
+
+- ## Distribute Plugins is Hard
+  - Either statically compile all plugins in binary
+  - Or design stable application binary interface
+
+- ## Fewer External Contributions
+
+</v-clicks>
+
+</div>
+
+<div>
+    <Tweet v-click id="1726663311541100626"/>
+</div>
+
+</div>
+
+---
+layout: image-right
+image: /ast.jpg
+---
+
+# So we need JS API!
+
+
+* ### Plugin system is beyond the scope of this talk.
+
+* ### We'll concentrate on how to write Rust tooling plugins in JavaScript.
+
+* ### One critical part of FE tooling is parsing code into Abstract Syntax Tree (AST)
+
+
+---
+
+# Choosing Parsers
+
+We focus on **TypeScript** parsers in this talk.
+
+- **[ast-grep](https://ast-grep.github.io/)**: A tool[^1] for code structural search, lint, and rewriting based on AST. Using its [napi binding](https://github.com/ast-grep/ast-grep/tree/main/crates/napi).
+- **[Tree-sitter](https://tree-sitter.github.io)**: An incremental parsing library that can build and update concrete syntax trees.
+- **[swc](https://swc.rs/)**: A super-fast TS/JS compiler written in Rust, performant and usable in both RS and JS.
+- **[oxc](https://oxc-project.github.io/)**: A suite of high-performance tools for JS/TS, maybe the fastest parser.
+
+<br/>
+
+- **[Babel](https://babeljs.io/)**: The Babel parser (previously Babylon) is a JavaScript parser used in Babel compiler.
+- **[TypeScript](https://www.typescriptlang.org/)**: The official parser implementation from the TypeScript team.
+
+<br/>
+
+[^1]: Disclaimer: Presenter is ast-grep's [author](https://github.com/HerringtonDarkholme)
+
+---
+
+# NAPI Pros & Cons
+
+- ## Cross Language Interop
+  - Foreign Function Call is expensive
+  - Serialization/Deserialization
+  - String Encoding convert utf-16 to utf-8
 
 ---
 layout: image-right
