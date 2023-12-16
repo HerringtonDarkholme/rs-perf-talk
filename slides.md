@@ -155,6 +155,21 @@ image: /ast.jpg
 
 * ### One critical part of FE tooling is parsing code into Abstract Syntax Tree (AST)
 
+---
+
+# NAPI-rs Pros & Cons
+
+We need to use binding to call Rust from JavaScript. napi-rs is our first choice :).
+
+- ## Pros
+  - All performance gain from Rust!
+  - Easy to use high-level API
+  - Amazing tooling support
+- ## Cross Language Interop
+  - Foreign Function Call is expensive
+  - Serialization/Deserialization
+  - String Encoding convert utf-16 to utf-8
+
 
 ---
 
@@ -162,8 +177,11 @@ image: /ast.jpg
 
 We focus on **TypeScript** parsers in this talk.
 
-- **[ast-grep](https://ast-grep.github.io/)**: A tool[^1] for code structural search, lint, and rewriting based on AST. Using its [napi binding](https://github.com/ast-grep/ast-grep/tree/main/crates/napi).
+- **[ast-grep](https://ast-grep.github.io/)**: A tool[^1] for structural search, lint, and rewriting based on AST, using its [napi binding](https://github.com/ast-grep/ast-grep/tree/main/crates/napi).
 - **[Tree-sitter](https://tree-sitter.github.io)**: An incremental parsing library that can build and update concrete syntax trees.
+
+<br/>
+
 - **[swc](https://swc.rs/)**: A super-fast TS/JS compiler written in Rust, performant and usable in both RS and JS.
 - **[oxc](https://oxc-project.github.io/)**: A suite of high-performance tools for JS/TS, maybe the fastest parser.
 
@@ -173,17 +191,102 @@ We focus on **TypeScript** parsers in this talk.
 - **[TypeScript](https://www.typescriptlang.org/)**: The official parser implementation from the TypeScript team.
 
 <br/>
+<br/>
 
 [^1]: Disclaimer: Presenter is ast-grep's [author](https://github.com/HerringtonDarkholme)
 
+
 ---
 
-# NAPI Pros & Cons
+# Benchmark Design
 
-- ## Cross Language Interop
-  - Foreign Function Call is expensive
-  - Serialization/Deserialization
-  - String Encoding convert utf-16 to utf-8
+We consider two main factors
+
+<v-click>
+
+- **File Size**
+  - Different file sizes reveal distinct performance characteristics.
+
+- **Concurrency Level**
+  - JavaScript is single threaded. native parsers can run in separate threads
+
+<br/>
+</v-click>
+
+<v-click>
+
+***
+
+<p class="opacity-50">We are not considering these factors</p>
+
+- **Warmup and JIT:** No significant difference observed
+- **GC, Memory Usage:** Not typical bottleneck in parsing
+- **Node.js parameter:** default Node.js arguments were used
+
+</v-click>
+
+
+---
+
+# File Size Categories
+
+To assess parser performance across a variety of codebases
+
+- **Single Line:**
+  - A one-line snippet, `let a = 123;`, to measure baseline overhead.
+- **Small File:**
+  - A concise 24-line module, representing a common utility file.
+- **Medium File:**
+  - A typical 400-line file, reflecting average development workloads.
+- **Large File:**
+  - The glorious `checker.ts` from the TypeScript repository.
+
+
+---
+
+# Concurrency Level
+
+More cores, more power.
+
+* We simulate workload by **parsing five files concurrently**.
+
+* This number is an arbitrary but reasonable proxy to the actual JavaScript tooling.
+
+* This benchmark is a general overview to reveal the performance characteristics.
+
+* Feel free to adjust the benchmark setup to better fit your workload.
+
+
+---
+
+# Results
+
+Raw data can be found in this [Google Sheet](https://docs.google.com/spreadsheets/d/1oIRXDaJ-EnjKz8GKpmUjVwh_FNw4Nsf6mbA0QPCiTh0/edit#gid=0).
+
+Perf Measurement
+
+* data are collected Benny benchmarking framework
+* performance is calcuated as operations per second
+
+Normalized comparison
+
+* The fastest parser is designated as the benchmark, set at 100% efficiency.
+* Other parsers are evaluated relatively, as a percentage of the fastest parser’s speed.
+
+Two types of benchmarks
+
+* Synchronous Parsing
+* Asynchronous Parsing
+
+---
+
+![Image description](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/rghu4pqjmutcueudt81s.png)
+
+![Image description](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/qfwhfivek2p0rq3m3paf.png)
+
+TypeScript consistently outperforms the competition across all file sizes, being twice as fast as Babel.
+Native language parsers show improved performance for larger files due to the reduced relative impact of FFI overhead.
+Nevertheless, the performance gains are not as pronounced due to serialization and deserialization (serde) overhead, which is proportional to the input file size.
 
 ---
 layout: image-right
