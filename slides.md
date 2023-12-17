@@ -69,15 +69,6 @@ transition: fade-out
 - **Turbopack** - For Next.js
 
 <style>
-h1 {
-  background-color: #2B90B6;
-  background-image: linear-gradient(45deg, #4EC5D4 10%, #146b8c 20%);
-  background-size: 100%;
-  -webkit-background-clip: text;
-  -moz-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  -moz-text-fill-color: transparent;
-}
 </style>
 
 <!--
@@ -520,6 +511,92 @@ In our benchmark, we focused on parsers that offer a JavaScript API.
   * No parsing API
   * [Unable to produce a complete AST](https://github.com/alangpierce/sucrase#motivation)
 * **Esprima**: lacks TypeScript support
+
+
+---
+
+# JS Parsers
+
+## **Babel**
+- Babel has two main packages: `@babel/core` and `@babel/parser`
+- `@babel/core` is slower `@babel/parser`
+- `parseAsync` in Babel is not genuinely async
+- it's a sync parser method wrapped in an async function
+- Babel's performance is not stable
+
+## TypeScript
+- TSC parses pretty fast!
+- Bottleneck for TSC is type checking
+
+---
+
+### Native Parser Review
+
+<v-click>
+
+#### SWC
+- Offers a broad range of APIs. A top choice for Rust tooling
+- Has some inherent overhead, though
+
+</v-click>
+
+<v-click>
+
+#### Oxc
+- Probably the fastest parser available
+- Speed is tempered by serde, as we use `JSON.parse` to reflect real-world usage
+
+</v-click>
+<v-click>
+
+#### Tree-sitter
+- A general parser for many languages, not optimized for TypeScript
+- Raw speed aligns closely with that of Babel
+- Rust parser is not faster by default, even without N-API overhead :)
+
+</v-click>
+
+<v-click>
+
+#### ast-grep
+- Powered by tree-sitter, but slightly faster
+- Maybe napi.rs is a faster binding than manual using C++ [nan.h](https://github.com/tree-sitter/node-tree-sitter/blob/master/src/parser.h)
+
+</v-click>
+
+---
+layout: two-cols
+---
+
+# Native Performance Tricks
+
+How can we make Rust binding faster?
+
+**Avoid Serde Cost at beginning**
+
+- Return a Rust object wrapper to Node.js
+- Can lead to slower AST access in JS
+- The cost is amortized over the reading phase
+
+**Use multiple CPU cores**
+
+- NAPI can use `AsyncTask` for multi-cores
+- `AsyncTask` is scheduled on [libuv threads](http://docs.libuv.org/en/v1.x/threadpool.html)
+- libuv thread pool size is set to four by default
+- [Expand thread pool size](https://dev.to/bleedingcode/increase-node-js-performance-with-libuv-thread-pool-5h10) can improve perf
+
+::right::
+
+```cpp {1-3}
+// async work is scheduled on libuv threads!
+napi_status NAPI_CDECL napi_create_async_work(...) {
+  uvimpl::Work* work = uvimpl::Work::New(
+    evn, resource, name, execute, complete, data);
+  ... // more omitted
+}
+```
+
+![libuv](/libuv.png)
 
 ---
 layout: image-right
