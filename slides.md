@@ -90,7 +90,7 @@ layout: default
 
 # Why Rust?
 
-<v-clicks>
+<v-clicks fade>
 
 - ### Peak Performance
   - Better Compiler Optimization
@@ -118,7 +118,7 @@ level: 2
 
 Designing an efficient and portable plugin system.
 
-<v-clicks>
+<v-clicks fade>
 
 - ## Learning Curve
   - Lifetime
@@ -208,7 +208,7 @@ We consider two main factors
   - Different file sizes reveal distinct performance characteristics.
 
 - **Concurrency Level**
-  - JavaScript is single threaded. native parsers can run in separate threads
+  - JavaScript is single threaded. Native parsers can run in separate threads
 
 <br/>
 </v-click>
@@ -254,7 +254,7 @@ More cores, more power.
 
 * This benchmark is a general overview to reveal the performance characteristics.
 
-* Feel free to adjust the benchmark setup to better fit your workload.
+* Feel free to adjust the benchmark setup to better fit your workload. :)
 
 
 ---
@@ -263,30 +263,153 @@ More cores, more power.
 
 Raw data can be found in this [Google Sheet](https://docs.google.com/spreadsheets/d/1oIRXDaJ-EnjKz8GKpmUjVwh_FNw4Nsf6mbA0QPCiTh0/edit#gid=0).
 
-Perf Measurement
+<v-clicks fade>
 
-* data are collected Benny benchmarking framework
-* performance is calcuated as operations per second
+* Perf Measurement
+    * data are collected Benny benchmarking framework
+    * performance is calcuated as operations per second
 
-Normalized comparison
+* Normalized Comparison
+    * The fastest parser is designated as the benchmark, set at 100% efficiency.
+    * Other parsers are evaluated relatively, as a percentage of the fastest parser’s speed.
 
-* The fastest parser is designated as the benchmark, set at 100% efficiency.
-* Other parsers are evaluated relatively, as a percentage of the fastest parser’s speed.
+* Two types of benchmarks
+    * Synchronous Parsing
+    * Asynchronous Parsing
 
-Two types of benchmarks
-
-* Synchronous Parsing
-* Asynchronous Parsing
+</v-clicks>
 
 ---
+layout: center
+---
 
-![Image description](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/rghu4pqjmutcueudt81s.png)
+# Sync Parse
+
+Perf Chart
 
 ![Image description](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/qfwhfivek2p0rq3m3paf.png)
 
-TypeScript consistently outperforms the competition across all file sizes, being twice as fast as Babel.
-Native language parsers show improved performance for larger files due to the reduced relative impact of FFI overhead.
-Nevertheless, the performance gains are not as pronounced due to serialization and deserialization (serde) overhead, which is proportional to the input file size.
+---
+
+# Sync Parse
+
+Perf Table
+
+![Image description](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/rghu4pqjmutcueudt81s.png)
+
+* TypeScript consistently outperforms the competition
+* Native parsers show improved performance for larger files
+* Babel demonstrates unstable performance
+
+---
+layout: center
+---
+
+# Async Parse
+
+Perf Chart
+
+![Image description](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/vnyust8234v4y1vtsm6q.png)
+
+---
+
+# Async Parse
+
+![Image description](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/xs8ve7oelccjcrh1lbdj.png)
+
+* ast-grep excels when handling multiple medium to large files concurrently
+* TypeScript and Tree-sitter experience a decline in performance with larger files
+* SWC and Oxc maintain consistent performance
+
+
+---
+
+# Parse Time Breakdown
+
+NAPI time can be dissected into three main components
+
+$$
+\textit{time} = \textit{ffi\_time} + \textit{parse\_time} + \textit{serde\_time}
+$$
+
+
+- Foreign Function Interface: A fixed cost to invoke functions across different languages
+
+- Parse: a variable cost that scales with the size of the input
+
+- Serialization/Deserialization: convert Rust data into a JS-compatible format. It may be a fixed or variable cost, depending on the implementation
+
+<!--
+In essence, benchmarking a parser involves measuring the time for the actual parsing (`parse_time`) and accounting for the extra overhead from cross-language function calls (`ffi_time`) and data format conversion (`serde_time`).
+
+Understanding these elements helps us evaluate the efficiency and scalability of the parser in question.
+-->
+
+---
+
+# Result Interpretation
+
+We will interpret the results in the following order
+
+* FFI Overhead
+* Serde Overhead
+* Parallel Parsing
+
+---
+layout: two-cols
+clicks: 3
+---
+
+# FFI Overhead
+
+<br/>
+
+<v-clicks>
+
+* "one line" stands for the baseline FFI overhead
+  * minimal parse/serde time
+* FFI is less significant as file size grows
+  * it's largely size-independent
+  * ast-grep's perf increased from 72% to 78%
+  * suggesting a rough 6% FFI overhead
+* FFI is more pronounced in async parsing
+  * ast-grep’s one-line perf: 72% sync vs 60% async
+  * swc/oxc may have [unique implementation](https://github.com/oxc-project/oxc/blob/2d5e0d5d0775300463f36b925e2f1ce71f119b90/napi/parser/src/lib.rs#L96).
+
+</v-clicks>
+
+::right::
+
+<arrow v-click="[1, 2]" x1="170" y1="10" x2="170" y2="60" color="#564" width="2" arrowSize="1" />
+<arrow v-click="[1, 2]" x1="170" y1="420" x2="170" y2="370" color="#564" width="2" arrowSize="1" />
+
+<arrow v-click="[2, 3]" x1="270" y1="10" x2="170" y2="60" color="#564" width="2" arrowSize="1" />
+<arrow v-click="[2, 3]" x1="300" y1="10" x2="400" y2="60" color="#564" width="2" arrowSize="1" />
+
+<arrow v-click="[3, 4]" x1="230" y1="180" x2="180" y2="90" color="#564" width="2" arrowSize="1" />
+<arrow v-click="[3, 4]" x1="230" y1="370" x2="180" y2="280" color="#564" width="2" arrowSize="1" />
+
+<br/>
+
+![Image description](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/rghu4pqjmutcueudt81s.png)
+
+<br/>
+
+![Image description](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/xs8ve7oelccjcrh1lbdj.png)
+
+---
+
+# Serde Overhead
+Unfortunately, we failed to replicate swc/oxc's blazing performance we witnessed in other applications.
+Despite minimal FFI impact in “Large file” test cases, swc and oxc underperform compared to the TypeScript compiler. This can be attributed to their reliance on calling [`JSON.parse` on strings](https://github.com/swc-project/swc/blob/5d944185187402691292fdb73ea767bd580e2a52/node-swc/src/index.ts#L108) returned from Rust, which is, to our disappointment, still more efficient than direct data structure returns.
+
+Tree-sitter and ast-grep avoid serde overhead by [returning a tree object](https://github.com/ast-grep/ast-grep/blob/1c3accfd7dccef293c480951759b86c418cde977/crates/napi/src/sg_node.rs#L297) rather than a full AST structure. Accessing tree nodes requires [invoking Rust methods](https://github.com/ast-grep/ast-grep/blob/1c3accfd7dccef293c480951759b86c418cde977/crates/napi/src/sg_node.rs#L78) from JavaScript, which distributes the cost over the reading process.
+
+---
+
+# Parallel
+
+Except tree-sitter, all native TS parsers have parallel support. Contrary to JS parsers, native parsers performance will not degrade when concurrently parsing larger files. This is thanks to the power of multiple cores. JS parsers suffer from CPU bound because they have to parse file one by one.
 
 ---
 layout: image-right
@@ -328,38 +451,6 @@ function updateUser(id: number, update: User) {
 }
 </style>
 
----
-
-# Components
-
-<div grid="~ cols-2 gap-4">
-<div>
-
-You can use Vue components directly inside your slides.
-
-We have provided a few built-in components like `<Tweet/>` and `<Youtube/>` that you can use directly. And adding your custom components is also super easy.
-
-```html
-<Counter :count="10" />
-```
-
-<!-- ./components/Counter.vue -->
-<Counter :count="10" m="t-4" />
-
-Check out [the guides](https://sli.dev/builtin/components.html) for more.
-
-</div>
-<div>
-
-```html
-<Tweet id="1390115482657726468" />
-```
-
-<Tweet v-click id="1390115482657726468" />
-
-</div>
-</div>
-
 <!--
 Presenter note with **bold**, *italic*, and ~~striked~~ text.
 
@@ -370,37 +461,6 @@ Also, HTML elements are valid:
 </div>
 -->
 
-
----
-class: px-20
----
-
-# Themes
-
-Slidev comes with powerful theming support. Themes can provide styles, layouts, components, or even configurations for tools. Switching between themes by just **one edit** in your frontmatter:
-
-<div grid="~ cols-2 gap-2" m="t-2">
-
-```yaml
----
-theme: default
----
-```
-
-```yaml
----
-theme: seriph
----
-```
-
-<img border="rounded" src="https://github.com/slidevjs/themes/blob/main/screenshots/theme-default/01.png?raw=true" alt="">
-
-<img border="rounded" src="https://github.com/slidevjs/themes/blob/main/screenshots/theme-seriph/01.png?raw=true" alt="">
-
-</div>
-
-Read more about [How to use a theme](https://sli.dev/themes/use.html) and
-check out the [Awesome Themes Gallery](https://sli.dev/themes/gallery.html).
 
 ---
 preload: false
