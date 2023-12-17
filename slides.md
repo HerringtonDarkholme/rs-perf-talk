@@ -459,6 +459,36 @@ layout: two-cols
 * Almost all native TS parsers have parallel support, except tree-sitter
 * Native will not parse slower more files to parse at the same time
 
+
+---
+
+#  Perf Summary
+
+The perf summary table outlines the time complexity for different operations.
+
+![Image description](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/0rm26rv2o0jndzeubxib.png)
+
+* `constant` denotes a constant time cost that does not change with input size
+
+* `proportional` indicates a variable cost that grows proportionally with the input size
+
+* `N/A` signifies that the cost is not applicable
+
+---
+
+#  Perf Summary
+
+* JS-based parsers run entirely in JS Engine
+  * No FFI or serde overhead
+  * Only parsing time, which grows with the input file size
+
+* Rust-based parsers is influenced by a fixed FFI cost, a variable parsing and serde cost
+  * serde overhead varies depending on the implementation
+  * ast-grep/tree-sitter have a fixed serialization cost of one tree object
+  * swc/oxc have the serde costs proportional to the input size
+
+* Native parsers can be parallel, while JS parsers cannot
+
 ---
 layout: image-right
 image: https://source.unsplash.com/collection/94734566/1920x1080
