@@ -398,12 +398,48 @@ clicks: 3
 ![Image description](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/xs8ve7oelccjcrh1lbdj.png)
 
 ---
+layout: two-cols
+---
 
 # Serde Overhead
-Unfortunately, we failed to replicate swc/oxc's blazing performance we witnessed in other applications.
-Despite minimal FFI impact in “Large file” test cases, swc and oxc underperform compared to the TypeScript compiler. This can be attributed to their reliance on calling [`JSON.parse` on strings](https://github.com/swc-project/swc/blob/5d944185187402691292fdb73ea767bd580e2a52/node-swc/src/index.ts#L108) returned from Rust, which is, to our disappointment, still more efficient than direct data structure returns.
 
-Tree-sitter and ast-grep avoid serde overhead by [returning a tree object](https://github.com/ast-grep/ast-grep/blob/1c3accfd7dccef293c480951759b86c418cde977/crates/napi/src/sg_node.rs#L297) rather than a full AST structure. Accessing tree nodes requires [invoking Rust methods](https://github.com/ast-grep/ast-grep/blob/1c3accfd7dccef293c480951759b86c418cde977/crates/napi/src/sg_node.rs#L78) from JavaScript, which distributes the cost over the reading process.
+Unfortunately, we failed to replicate swc/oxc's blazing performance we witnessed in other applications.
+
+* swc/oxc is slower than TSC
+  * Caused by calling [`JSON.parse` on strings](https://github.com/swc-project/swc/blob/5d944185187402691292fdb73ea767bd580e2a52/node-swc/src/index.ts#L108)
+  * Sending RS data is even slower than JSON
+* Tree-sitter/ast-grep avoid serde overhead
+  * By [returning a tree object](https://github.com/ast-grep/ast-grep/blob/1c3accfd7dccef293c480951759b86c418cde977/crates/napi/src/sg_node.rs#L297)
+  * Tree nodes access requires [invoking Rust methods](https://github.com/ast-grep/ast-grep/blob/1c3accfd7dccef293c480951759b86c418cde977/crates/napi/src/sg_node.rs#L78) from JS
+  * _Distribute the cost over reading_
+
+::right::
+
+SWC's JSON parse
+```ts {3-5}
+parseSync(src, options, filename) {
+  ...
+  if (bindings) {
+    return JSON.parse(
+      bindings.parseSync(src, toBuffer(options), filename)
+    );
+  } else { ... }
+}
+```
+
+ast-grep's tree
+```rs
+#[napi]
+impl SgRoot { ... } // in Rust
+```
+```ts
+export class SgNode { // in JS
+  text(): string
+  parent(): SgNode | null
+  children(): SgNode[]
+}
+// serde cost is amortized across reads
+```
 
 ---
 
