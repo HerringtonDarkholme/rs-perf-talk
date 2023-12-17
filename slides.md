@@ -442,10 +442,22 @@ export class SgNode { // in JS
 ```
 
 ---
+layout: two-cols
+---
 
-# Parallel
+<br/>
+<br/>
 
-Except tree-sitter, all native TS parsers have parallel support. Contrary to JS parsers, native parsers performance will not degrade when concurrently parsing larger files. This is thanks to the power of multiple cores. JS parsers suffer from CPU bound because they have to parse file one by one.
+![Image description](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/vnyust8234v4y1vtsm6q.png)
+
+::right::
+
+# Parallel Parsing
+
+* JS parsers are slower when parsing concurrently
+* They are CPU bounded because files must be parsed one by one on main the thread
+* Almost all native TS parsers have parallel support, except tree-sitter
+* Native will not parse slower more files to parse at the same time
 
 ---
 layout: image-right
