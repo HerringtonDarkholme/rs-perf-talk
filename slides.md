@@ -15,6 +15,7 @@ transition: fade
 title: Benchmark Rusty Parsers
 mdc: true
 colorSchema: 'light'
+
 ---
 
 # Benchmark Rusty Parsers
@@ -82,13 +83,13 @@ layout: default
 
 # Why Rust?
 
-<v-clicks fade>
+<v-clicks>
 
 - ### Peak Performance
   - Better Compiler Optimization
   - Compact Data Layout: less cache miss / fewer instructions
   - Multiple Threads
-  - Powerful Hardware Intrinsics, e.g. SIMD
+  - Powerful Low-level Intrinsics, e.g. SIMD / System Calls
 - ### Predictable Performance
   - No Garbage Collection
   - No JIT deoptimization
@@ -100,17 +101,17 @@ layout: default
 
 ---
 transition: slide-up
-level: 2
 ---
 
 # Why Not Rust Plugins?
 
+Hard to design an efficient, portable and friendly plugins
+
 <div grid="~ cols-2 gap-4">
 <div>
 
-Designing an efficient and portable plugin system.
 
-<v-clicks fade>
+<v-clicks>
 
 - ## Learning Curve
   - Lifetime
@@ -147,6 +148,10 @@ image: /ast.jpg
 
 * ### One critical part of FE tooling is parsing code into Abstract Syntax Tree (AST)
 
+* ### Our topic today is to benchmark parsers!
+
+---
+transition: slide-up
 ---
 
 # NAPI-rs Pros & Cons
@@ -157,15 +162,15 @@ We need to use binding to call Rust from JavaScript. napi-rs is our first choice
   - All performance gain from Rust!
   - Easy to use high-level API
   - Amazing tooling support
-- ## Cross Language Interop
+- ## Cons: Cross Language Interop
   - Foreign Function Call is expensive
   - Serialization/Deserialization
-  - String Encoding convert utf-16 to utf-8
-
+  - String Encoding from utf-16 to utf-8
 
 ---
 
 # Choosing Parsers
+
 
 We focus on **TypeScript** parsers in this talk.
 
@@ -235,6 +240,8 @@ To assess parser performance across a variety of codebases
 
 
 ---
+transition: slide-up
+---
 
 # Concurrency Level
 
@@ -255,10 +262,10 @@ More cores, more power.
 
 Raw data can be found in this [Google Sheet](https://docs.google.com/spreadsheets/d/1oIRXDaJ-EnjKz8GKpmUjVwh_FNw4Nsf6mbA0QPCiTh0/edit#gid=0).
 
-<v-clicks fade>
+<v-clicks>
 
 * Perf Measurement
-    * data are collected Benny benchmarking framework
+    * data are collected from Benny benchmark framework
     * performance is calcuated as operations per second
 
 * Normalized Comparison
@@ -304,6 +311,8 @@ Perf Chart
 ![Image description](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/vnyust8234v4y1vtsm6q.png)
 
 ---
+transition: slide-up
+---
 
 # Async Parse
 
@@ -320,9 +329,13 @@ Perf Chart
 
 NAPI time can be dissected into three main components
 
+<h1>
+
 $$
 \textit{time} = \textit{ffi\_time} + \textit{parse\_time} + \textit{serde\_time}
 $$
+
+</h1>
 
 
 - Foreign Function Interface: A fixed cost to invoke functions across different languages
@@ -366,7 +379,7 @@ clicks: 3
   * suggesting a rough 6% FFI overhead
 * FFI is more pronounced in async parsing
   * ast-grep’s one-line perf: 72% sync vs 60% async
-  * swc/oxc may have [unique implementation](https://github.com/oxc-project/oxc/blob/2d5e0d5d0775300463f36b925e2f1ce71f119b90/napi/parser/src/lib.rs#L96).
+  * swc may have its [unique implementation](https://github.com/oxc-project/oxc/blob/2d5e0d5d0775300463f36b925e2f1ce71f119b90/napi/parser/src/lib.rs#L96).
 
 </v-clicks>
 
@@ -391,11 +404,14 @@ clicks: 3
 
 ---
 layout: two-cols
+clicks: 2
 ---
 
 # Serde Overhead
 
 Unfortunately, we failed to replicate swc/oxc's blazing performance we witnessed in other applications.
+
+<v-clicks>
 
 * swc/oxc is slower than TSC
   * Caused by calling [`JSON.parse` on strings](https://github.com/swc-project/swc/blob/5d944185187402691292fdb73ea767bd580e2a52/node-swc/src/index.ts#L108)
@@ -405,7 +421,11 @@ Unfortunately, we failed to replicate swc/oxc's blazing performance we witnessed
   * Tree nodes access requires [invoking Rust methods](https://github.com/ast-grep/ast-grep/blob/1c3accfd7dccef293c480951759b86c418cde977/crates/napi/src/sg_node.rs#L78) from JS
   * _Distribute the cost over reading_
 
+</v-clicks>
+
 ::right::
+
+<div v-click=[1,3]>
 
 SWC's JSON parse
 ```ts {3-5}
@@ -418,6 +438,10 @@ parseSync(src, options, filename) {
   } else { ... }
 }
 ```
+
+</div>
+
+<div v-click=[2,3]>
 
 ast-grep's tree
 ```rs
@@ -432,6 +456,8 @@ export class SgNode { // in JS
 }
 // serde cost is amortized across reads
 ```
+
+</div>
 
 ---
 layout: two-cols
@@ -449,8 +475,7 @@ layout: two-cols
 * JS parsers are slower when parsing concurrently
 * They are CPU bounded because files must be parsed one by one on main the thread
 * Almost all native TS parsers have parallel support, except tree-sitter
-* Native will not parse slower more files to parse at the same time
-
+* Native will not parse more files at the same time slower
 
 ---
 
@@ -466,6 +491,8 @@ The perf summary table outlines the time complexity for different operations.
 
 * `N/A` signifies that the cost is not applicable
 
+---
+transition: slide-up
 ---
 
 #  Perf Summary
@@ -489,11 +516,15 @@ The perf summary table outlines the time complexity for different operations.
 
 <br/>
 
+<v-clicks>
+
 * Native JS compilers are famous for their transformation speed
 * Transformation and Parsing are different!
   * transform: Source String -> Rust Data -> Transformed String
   * parse: Source String -> Rust Data -> JS Data
 * Passing Rust data to JavaScript is a complex task
+
+</v-clicks>
 
 ---
 
@@ -518,7 +549,7 @@ In our benchmark, we focused on parsers that offer a JavaScript API.
 
 # JS Parsers
 
-## **Babel**
+## Babel
 - Babel has two main packages: `@babel/core` and `@babel/parser`
 - `@babel/core` is slower `@babel/parser`
 - `parseAsync` in Babel is not genuinely async
@@ -531,7 +562,7 @@ In our benchmark, we focused on parsers that offer a JavaScript API.
 
 ---
 
-### Native Parser Review
+# Native Parser Review
 
 <v-click>
 
@@ -567,26 +598,33 @@ In our benchmark, we focused on parsers that offer a JavaScript API.
 
 ---
 layout: two-cols
+clicks: 2
 ---
 
-# Native Performance Tricks
+# Performance Tricks
 
 How can we make Rust binding faster?
 
-**Avoid Serde Cost at beginning**
+<v-clicks>
 
-- Return a Rust object wrapper to Node.js
-- Can lead to slower AST access in JS
-- The cost is amortized over the reading phase
+- **Avoid Serde Cost at beginning**
 
-**Use multiple CPU cores**
+  - Return a Rust object wrapper to Node.js
+  - Can lead to slower AST access in JS
+  - The cost is amortized over the reading phase
 
-- NAPI can use `AsyncTask` for multi-cores
-- `AsyncTask` is scheduled on [libuv threads](http://docs.libuv.org/en/v1.x/threadpool.html)
-- libuv thread pool size is set to four by default
-- [Expand thread pool size](https://dev.to/bleedingcode/increase-node-js-performance-with-libuv-thread-pool-5h10) can improve perf
+- **Use multiple CPU cores**
+
+  - NAPI can use `AsyncTask` for multi-cores
+  - `AsyncTask` is scheduled on [libuv threads](http://docs.libuv.org/en/v1.x/threadpool.html)
+  - libuv thread pool size is set to four by default
+  - [Expand thread pool size](https://dev.to/bleedingcode/increase-node-js-performance-with-libuv-thread-pool-5h10) can improve perf
+
+</v-clicks>
 
 ::right::
+
+<div v-click=[2,3]>
 
 ```cpp {1-3}
 // async work is scheduled on libuv threads!
@@ -599,21 +637,105 @@ napi_status NAPI_CDECL napi_create_async_work(...) {
 
 ![libuv](/libuv.png)
 
+</div>
+
 ---
 
 # Future Outlook
 
 Several promising avenues can further refine Rust performance
 
-- **Minimizing Serde Overhead**
-  - By optimizing serde processes, we can reduce the performance toll these operations take
+- **Minimize Serde Overhead**
+  - We can reduce the performance toll these operations take
 
-- **Harnessing Multi-core Capabilities**
-  - Effective utilization of multi-core architectures can lead to substantial gains in parsing speeds
-- **Promoting AST Reusability**
-  - Reuse AST within JavaScript can diminish the frequency of costly parsing operations
-- **Shifting Workloads to Rust**
+- **Harness Multi-core Capabilities**
+  - Effective utilization of multi-core can lead to substantial gains in speed
+- **Promote AST Reusability**
+  - Reuse AST within JavaScript can diminish the frequency of costly parsing
+- **Shift Workloads to Rust**
   - Creating a DSL for AST could shift a great portion of work to the Rust side
+
+---
+transition: slide-left
+clicks: 3
+---
+
+# Future Outlook, Take One
+
+
+<div grid="~ cols-2 gap-4">
+<div>
+
+<v-click>
+
+A proof of concept implementation of passing binary AST to JavaScript.
+
+</v-click>
+
+<v-click>
+
+JavaScript can selectively read flexbuffers-based AST nodes on demand to avoid the deserialization toll.
+
+</v-click>
+
+<v-click>
+
+***
+
+Preliminary results, for reference only.
+
+```
+~ node test_buffer.js
+testJSON: 4.043s
+testBuffer: 2.395s
+```
+
+Buffer based API is 100% faster than JSON.
+
+https://github.com/oxc-project/oxc/pull/1680
+
+</v-click>
+
+</div>
+<div>
+
+<div v-click=[1,4]>
+
+```rust {7-9}
+#[napi]
+pub fn parse_sync_buffer(
+    source_text: String, options: Option<ParserOptions>
+) -> Buffer {
+    let options = options.unwrap_or_default();
+    let allocator = Allocator::default();
+    let ret = parse(&allocator, &source_text, &options);
+    let mut serializer = FlexbufferSerializer::new();
+    ret.program.serialize(&mut serializer).unwrap();
+    serializer.take_buffer().into()
+}
+```
+
+</div>
+
+<br/>
+
+<div v-click=[2,4]>
+
+```js {2,3}
+function testBuffer() {
+  const buffer = oxc.parseSyncBuffer(file);
+  const ref = flexbuffers.toReference(buffer.buffer);
+  assert(ref.isMap());
+  assert.equal(ref.get('type').stringValue(), 'Program');
+  const body = ref.get('body');
+  assert(body.isVector());
+}
+```
+
+</div>
+
+</div>
+</div>
 
 ---
 layout: image-right
