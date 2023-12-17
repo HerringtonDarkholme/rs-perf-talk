@@ -490,6 +490,38 @@ The perf summary table outlines the time complexity for different operations.
 * Native parsers can be parallel, while JS parsers cannot
 
 ---
+
+# Discussion
+
+## Why the benchmark shows Rust is slow?
+
+<br/>
+
+* Native JS compilers are famous for their transformation speed
+* Transformation and Parsing are different!
+  * transform: Source String -> Rust Data -> Transformed String
+  * parse: Source String -> Rust Data -> JS Data
+* Passing Rust data to JavaScript is a complex task
+
+---
+
+# Other Compilers
+
+What about XX parsers? Why are they not included?
+
+In our benchmark, we focused on parsers that offer a JavaScript API.
+
+* **Esbuild**
+  * Primarily used as a bundler
+  * Can transform and build JS app but
+  * [Does not expose AST](https://esbuild.github.io/api/#js-details) to JavaScript
+* **Biome**: A CLI application without a JavaScript API
+* **Sucrase**
+  * No parsing API
+  * [Unable to produce a complete AST](https://github.com/alangpierce/sucrase#motivation)
+* **Esprima**: lacks TypeScript support
+
+---
 layout: image-right
 image: https://source.unsplash.com/collection/94734566/1920x1080
 ---
