@@ -185,6 +185,33 @@ transition: slide-up
 layout: two-cols
 ---
 
+# But, JS <-> RS has cost!
+
+Calling Rust functions from JavaScript is expensive!
+
+<v-clicks>
+
+* Using Rust function in JS involves some extra conversions and steps.
+
+* **Foreign function call is like travel abroad.**
+  * function is destination
+  * arguments are luggage
+  * return value are souvenir
+  * calling convention is visa/passport
+
+* The more luggage/souvenir you have, the more money and time you need to pack and check them.
+
+</v-clicks>
+
+
+::right::
+
+![img](/crab.jpeg)
+
+---
+layout: two-cols
+---
+
 # NAPI-rs Pros & Cons
 
 We need to use binding to call Rust from JavaScript.
