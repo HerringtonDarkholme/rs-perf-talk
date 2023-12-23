@@ -182,20 +182,54 @@ image: /ast.jpg
 
 ---
 transition: slide-up
+layout: two-cols
 ---
 
 # NAPI-rs Pros & Cons
 
-We need to use binding to call Rust from JavaScript. napi-rs is our first choice :).
+We need to use binding to call Rust from JavaScript.
 
-- ## Pros
+_lib.rs_
+```rs
+use napi_derive::napi;
+
+#[napi]
+fn fibonacci(n: u32) -> u32 {
+  match n {
+    1 | 2 => 1,
+    _ => fibonacci(n - 1) + fibonacci(n - 2),
+  }
+}
+```
+
+_main.js_
+
+```js
+import { fibonacci } from './index.js'
+
+// output: 5
+console.log(fibonacci(5))
+```
+
+
+
+::right::
+
+<br/>
+
+NAPI-RS is a framework for building pre-compiled <span style="color:green">Node.js</span> addons in <span style="color:brown">Rust</span>.
+
+- Pros
   - All performance gain from Rust!
   - Easy to use high-level API
   - Amazing tooling support
-- ## Cons: Cross Language Interop
+
+- Cons: Cross Language Interop
   - Foreign Function Call is expensive
   - Serialization/Deserialization
   - String Encoding from utf-16 to utf-8
+
+&nbsp; _napi.rs is powerful, but it is not a silver bullet._
 
 ---
 
