@@ -311,14 +311,50 @@ transition: slide-up
 
 More cores, more power.
 
-* We simulate workload by **parsing five files concurrently**.
+* We simulate workload by _parsing five files concurrently_, in **sync** and **async** fashion.
+* This setup is an arbitrary, but reasonable, proxy to real-world usage.
+* This benchmark is for a general overview of RS-JS performance characteristics.
 
-* This number is an arbitrary but reasonable proxy to the actual JavaScript tooling.
+<br/>
 
-* This benchmark is a general overview to reveal the performance characteristics.
+***
 
-* Feel free to adjust the benchmark setup to better fit your workload. :)
+<div grid="~ cols-2 gap-2">
+<div>
 
+_sync bench_
+
+```ts
+// import parser function
+import {ts as sg} from '@ast-grep/napi'
+// parse code sync, returns AST
+const parseSync = () => sg.parse(source)
+
+// a for loop to parse 5 files, sequentailly
+for (let i = 0; i < CONCURRENCY; i++) {
+  parseSync()
+}
+```
+
+
+</div>
+<div>
+
+_async bench_
+```ts
+// import parser function
+import {ts as sg} from '@ast-grep/napi'
+// parse code async, returning a promise
+const parseAsync = () => sg.parseAsync(source)
+// a promise array of parseAsync
+const tasks = Array(CONCURRENCY).fill(undefined)
+  .map(parseAsync)
+// await all parse task completed
+await Promise.all(tasks)
+```
+
+</div>
+</div>
 
 ---
 
