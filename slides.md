@@ -365,16 +365,16 @@ Raw data can be found in this [Google Sheet](https://docs.google.com/spreadsheet
 <v-clicks>
 
 * Perf Measurement
-    * data are collected from Benny benchmark framework
-    * performance is calcuated as operations per second
+    * data are collected from _Benny_ benchmark framework
+    * performance is calcuated as _operations per second_
 
 * Normalized Comparison
-    * The fastest parser is designated as the benchmark, set at 100% efficiency.
-    * Other parsers are evaluated relatively, as a percentage of the fastest parser’s speed.
+    * The _fastest_ parser is designated as the benchmark, set at _100%_ efficiency
+    * Other parsers are evaluated relatively, as a percentage of the fastest parser's speed
 
 * Two types of benchmarks
-    * Synchronous Parsing
-    * Asynchronous Parsing
+    * _Synchronous Parsing_
+    * _Asynchronous Parsing_
 
 </v-clicks>
 
@@ -438,11 +438,11 @@ $$
 </h1>
 
 
-- Foreign Function Interface: A fixed cost to invoke functions across different languages
+- **Foreign Function Interface**: A fixed cost to invoke functions across different languages
 
-- Parse: a variable cost that scales with the size of the input
+- **Parse**: a variable cost that scales with the size of the input
 
-- Serialization/Deserialization: convert Rust data into a JS-compatible format. It may be a fixed or variable cost, depending on the implementation
+- **Serialization/Deserialization**: convert Rust data into a JS-compatible format. It may be a fixed or variable cost, depending on the implementation
 
 <!--
 In essence, benchmarking a parser involves measuring the time for the actual parsing (`parse_time`) and accounting for the extra overhead from cross-language function calls (`ffi_time`) and data format conversion (`serde_time`).
@@ -563,18 +563,23 @@ export class SgNode { // in JS
 layout: two-cols
 ---
 
-<br/>
+# Parallel Parsing
+
 <br/>
 
 ![Image description](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/vnyust8234v4y1vtsm6q.png)
 
 ::right::
 
-# Parallel Parsing
+<br/>
+<br/>
 
 * JS parsers are slower when parsing concurrently
+
 * They are CPU bounded because files must be parsed one by one on main the thread
+
 * Almost all native TS parsers have parallel support, except tree-sitter
+
 * Native will not parse more files at the same time slower
 
 ---
