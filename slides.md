@@ -56,7 +56,7 @@ image: /splash.png
 
 <style>
 .slidev-page-3.fade-enter-active {
-    transition-duration: 1.5s !important;
+    transition-duration: 3s !important;
 }
 </style>
 
@@ -617,18 +617,46 @@ transition: slide-up
 
 # Discussion
 
-## Why the benchmark shows Rust is slow?
-
-<br/>
+### Why the benchmark shows Rust is slow?
 
 <v-clicks>
 
 * Native JS compilers are famous for their transformation speed
-* Transformation and Parsing are different!
-  * transform: Source String -> Rust Data -> Transformed String
-  * parse: Source String -> Rust Data -> JS Data
-* Passing Rust data to JavaScript is a complex task
 
+* But Transformation and Parsing are different!
+
+<div grid="~ cols-2 gap-2">
+<div>
+Transform:
+Source -> Rust Data -> Transformed
+```rs
+"2 ** 3"  // source string
+/** PARSE **/
+BinaryOp { // Rust Data
+    left: Num(2), right: Num(3), op: **
+}
+/** GENERATE **/
+"Math.pow(2, 3)" // Transformed String
+```
+
+</div>
+<div>
+Parse: Source -> Rust Data -> JS Data
+
+```rs
+"2 ** 3"  // source string
+/** PARSE **/
+BinaryOp { // Rust Data
+    left: Num(2), right: Num(3), op: "**"
+}
+/** CONVERT TO JS **/
+var ast = { type: 'BinaryOp', left: 2, right: 3, op: '**'}
+```
+</div>
+</div>
+
+
+* Passing Rust data to JavaScript is a complex task
 </v-clicks>
 
 ---
