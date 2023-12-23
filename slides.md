@@ -54,6 +54,36 @@ layout: image
 image: /splash.png
 ---
 
+<style>
+.slidev-page-3.fade-enter-active {
+    transition-duration: 1.5s !important;
+}
+</style>
+
+---
+transition: fade-out
+layout: two-cols
+---
+
+# About Me
+
+A brief intro, won't be long
+
+<br/>
+
+* 🌐 Frontend Vimmer
+* 💻 A web dev
+* ⚒️ And a web-dev-tool dev
+* 💻 Enjoys TypeScript and Rust
+* 🚀 The author of [ast-grep](https://ast-grep.github.io/)
+* 🐙 [GitHub](https://github.com/HerringtonDarkholme)
+* 📰 [Medium](https://medium.com/@hchan_nvim)
+
+::right::
+
+<img style="padding: 30px 120px;" src="https://avatars.githubusercontent.com/u/2883231?v=4"/>
+<img src="https://ast-grep.github.io/logo.svg"/>
+
 ---
 transition: fade-out
 ---
