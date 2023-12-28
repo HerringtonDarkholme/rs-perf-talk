@@ -98,6 +98,7 @@ transition: fade-out
 - **Oxc** - Babel/Eslint
 - **Lightening CSS** - PostCSS
 - **Rolldown** - Rollup
+- **Tauri** - Electron
 - **Turbopack** - For Next.js
 
 <style>
