@@ -909,5 +909,10 @@ image: https://source.unsplash.com/collection/94734566/1920x1080
 
 <br/>
 
+### Thank [zaozao.run](https://www.zaozao.run) and [rustcc.cn](http://rustcc.cn/) for sponsoring this event!
 
-If you find this talk helpful, please [give it a star](https://github.com/ast-grep/ast-grep) and share it with your friends!
+
+* If you find this talk helpful, please [give it a star](https://github.com/ast-grep/ast-grep) and share it with your friends!
+
+* [https://github.com/ast-grep/ast-grep](https://github.com/ast-grep/ast-grep)
+
