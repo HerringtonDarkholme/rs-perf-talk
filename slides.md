@@ -471,7 +471,7 @@ layout: two-cols
 
 * Almost all native TS parsers have parallel support, except tree-sitter
 
-* Native will not parse more files at the same time slower
+* Native will not parse more four files at the same time
 
 ---
 
