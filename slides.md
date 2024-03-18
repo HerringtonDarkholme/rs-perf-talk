@@ -109,40 +109,36 @@ Here is another comment.
 -->
 
 ---
-layout: default
+layout: two-cols
 ---
 
-# Why Rust?
+# Rust Pros & Cons
 
-<v-clicks>
+## Why Rust?
+
+<v-click>
 
 - ### Peak Performance
   - Better Compiler Optimization
-  - Compact Data Layout: less cache miss / fewer instructions
+  - Compact Data Layout
   - Multiple Threads
-  - Powerful Low-level Intrinsics, e.g. SIMD / System Calls
+  - Powerful Low-level Intrinsics
 - ### Predictable Performance
   - No Garbage Collection
   - No JIT deoptimization
-- ### Ecosystem
-  - cargo toolchain is amazing
-  - napi.rs is goat
+- ### Great Ecosystem
+  - Cargo, Crates.io, napi.rs
 
-</v-clicks>
+</v-click>
 
----
-transition: slide-up
----
+::right::
 
-# Why Not Rust Plugins?
+<br/>
+<br/>
 
-Hard to design an efficient, portable and friendly plugins
+## Why Not Rust?
 
-<div grid="~ cols-2 gap-4">
-<div>
-
-
-<v-clicks>
+<v-click>
 
 - ## Learning Curve
   - Lifetime
@@ -154,30 +150,32 @@ Hard to design an efficient, portable and friendly plugins
   - Or design stable application binary interface
 
 - ## Fewer External Contributions
+  - Harder to learn
 
-</v-clicks>
+</v-click>
 
-</div>
-
-<div>
-    <Tweet v-click id="1726663311541100626"/>
-</div>
-
-</div>
+<!--
+- Compact Data Layout: less cache miss / fewer instructions
+- Powerful Low-level Intrinsics, e.g. SIMD / System Calls
+-->
 
 ---
 layout: image-right
 image: /ast.jpg
 ---
 
-# So we need JS API!
+# Benchmark Parsers!
 
+<br/>
 
-* ### Plugin system is beyond the scope of this talk.
+* ### JS plugin is more customizable and easier
+<br/>
 
-* ### We'll concentrate on how to write Rust tooling plugins in JavaScript.
+* ### JS plugin should understand and change the code
+<br/>
 
-* ### One critical part of FE tooling is parsing code into Abstract Syntax Tree (AST)
+* ### One critical task is parsing JS/TS code
+<br/>
 
 * ### Our topic today is to benchmark parsers!
 
@@ -210,223 +208,94 @@ Calling Rust functions from JavaScript is expensive!
 ![img](/crab.jpeg)
 
 ---
-layout: two-cols
----
 
-# NAPI-rs Pros & Cons
+# Benchmark Design: Choosing Parsers
 
-We need to use binding to call Rust from JavaScript.
+- **Tree-sitter Based**
+  - **[ast-grep](https://ast-grep.github.io/)**: A tree-sitter tool[^1] for structural search, lint, and rewriting based on AST
+  - **[Tree-sitter](https://tree-sitter.github.io)**: An incremental parsing library that can build and update concrete syntax trees.
 
-_lib.rs_
-```rs
-use napi_derive::napi;
+- **Native Rust**
+  - **[swc](https://swc.rs/)**: A super-fast TS/JS compiler written in Rust, performant and usable in both RS and JS.
+  - **[oxc](https://oxc-project.github.io/)**: A suite of high-performance tools for JS/TS, maybe the fastest parser.
 
-#[napi]
-fn fibonacci(n: u32) -> u32 {
-  match n {
-    1 | 2 => 1,
-    _ => fibonacci(n - 1) + fibonacci(n - 2),
-  }
-}
-```
+- **JavaScript Based**
+  - **[Babel](https://babeljs.io/)**: The Babel parser (previously Babylon) is a JavaScript parser used in Babel compiler.
+  - **[TypeScript](https://www.typescriptlang.org/)**: The official parser implementation from the TypeScript team.
 
-_main.js_
-
-```js
-import { fibonacci } from './index.js'
-
-// output: 5
-console.log(fibonacci(5))
-```
-
-
-
-::right::
-
-<br/>
-
-NAPI-RS is a framework for building pre-compiled <span style="color:green">Node.js</span> addons in <span style="color:brown">Rust</span>.
-
-- Pros
-  - All performance gain from Rust!
-  - Easy to use high-level API
-  - Amazing tooling support
-
-- Cons: Cross Language Interop
-  - Foreign Function Call is expensive
-  - Serialization/Deserialization
-  - String Encoding from utf-16 to utf-8
-
-&nbsp; _napi.rs is powerful, but it is not a silver bullet._
-
----
-
-# Choosing Parsers
-
-
-We focus on **TypeScript** parsers in this talk.
-
-- **[ast-grep](https://ast-grep.github.io/)**: A tool[^1] for structural search, lint, and rewriting based on AST, using its [napi binding](https://github.com/ast-grep/ast-grep/tree/main/crates/napi).
-- **[Tree-sitter](https://tree-sitter.github.io)**: An incremental parsing library that can build and update concrete syntax trees.
-
-<br/>
-
-- **[swc](https://swc.rs/)**: A super-fast TS/JS compiler written in Rust, performant and usable in both RS and JS.
-- **[oxc](https://oxc-project.github.io/)**: A suite of high-performance tools for JS/TS, maybe the fastest parser.
-
-<br/>
-
-- **[Babel](https://babeljs.io/)**: The Babel parser (previously Babylon) is a JavaScript parser used in Babel compiler.
-- **[TypeScript](https://www.typescriptlang.org/)**: The official parser implementation from the TypeScript team.
-
-<br/>
 <br/>
 
 [^1]: Disclaimer: Presenter is ast-grep's [author](https://github.com/HerringtonDarkholme)
 
-
 ---
-
-# Benchmark Design
-
-We consider two main factors
-
-<v-click>
-
-- **File Size**
-  - Different file sizes reveal distinct performance characteristics.
-
-- **Concurrency Level**
-  - JavaScript is single threaded. Native parsers can run in separate threads
-
-<br/>
-</v-click>
-
-<v-click>
-
-***
-
-<p class="opacity-50">We are not considering these factors</p>
-
-- **Warmup and JIT:** No significant difference observed
-- **GC, Memory Usage:** Not typical bottleneck in parsing
-- **Node.js parameter:** default Node.js arguments were used
-
-</v-click>
-
-
+layout: two-cols
 ---
 
 # File Size Categories
 
-To assess parser performance across a variety of codebases
+To assess parser across a variety of codebases
 
 - **Single Line:**
-  - A one-line snippet, `let a = 123;`, to measure baseline overhead.
+  - A one-line snippet as baseline
 - **Small File:**
-  - A concise 24-line module, representing a common utility file.
+  - A 24-line common utility file
 - **Medium File:**
-  - A typical 400-line file, reflecting average development workloads.
+  - A typical 400-line file of average file
 - **Large File:**
-  - The glorious `checker.ts` from the TypeScript repository.
+  - The glorious `checker.ts`
 
+<br/>
+<p class="opacity-50">Factors not considered: JIT/GC/NodeJS flags</p>
 
----
-transition: slide-up
----
+::right::
 
 # Concurrency Level
 
-More cores, more power.
+With more cores comes more performance
 
-* We simulate workload by _parsing five files concurrently_, in **sync** and **async** fashion.
-* This setup is an arbitrary, but reasonable, proxy to real-world usage.
-* This benchmark is for a general overview of RS-JS performance characteristics.
-
-<br/>
-
-***
-
-<div grid="~ cols-2 gap-2">
-<div>
-
-_sync bench_
+* Simulate workload by _parsing five files concurrently_
+* In **sync** and **async** fashion
 
 ```ts
-// import parser function
 import {ts as sg} from '@ast-grep/napi'
-// parse code sync, returns AST
+
+// sync version
 const parseSync = () => sg.parse(source)
-
 // a for loop to parse 5 files, sequentailly
-for (let i = 0; i < CONCURRENCY; i++) {
-  parseSync()
-}
-```
+for (let i = 0; i < CONCURRENCY; i++) { parseSync() }
 
-
-</div>
-<div>
-
-_async bench_
-```ts
-// import parser function
-import {ts as sg} from '@ast-grep/napi'
-// parse code async, returning a promise
-const parseAsync = () => sg.parseAsync(source)
-// a promise array of parseAsync
-const tasks = Array(CONCURRENCY).fill(undefined)
-  .map(parseAsync)
-// await all parse task completed
+// async version
+const parse = () => sg.parseAsync(source)
+// parse 5 files asynchronously and concurrently
+const tasks = Array(CONCURRENCY).fill(...).map(parse)
 await Promise.all(tasks)
 ```
 
-</div>
-</div>
-
----
-
-# Results
-
-Raw data can be found in this [Google Sheet](https://docs.google.com/spreadsheets/d/1oIRXDaJ-EnjKz8GKpmUjVwh_FNw4Nsf6mbA0QPCiTh0/edit#gid=0).
-
-<v-clicks>
-
-* Perf Measurement
-    * data are collected from _Benny_ benchmark framework
-    * performance is calcuated as _operations per second_
-
-* Normalized Comparison
-    * The _fastest_ parser is designated as the benchmark, set at _100%_ efficiency
-    * Other parsers are evaluated relatively, as a percentage of the fastest parser's speed
-
-* Two types of benchmarks
-    * _Synchronous Parsing_
-    * _Asynchronous Parsing_
-
-</v-clicks>
-
 ---
 layout: center
 ---
 
 # Sync Parse
 
-Perf Chart
+* performance is calcuated as _operations per second_
+* _Fastest_ parser has _100%_ score, others have percentages of the fastest parser's score
+
+<div grid="~ cols-5 gap-4">
+<div col="span-3">
 
 ![Image description](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/qfwhfivek2p0rq3m3paf.png)
 
----
+</div>
+<div col="span-2">
+<br/>
+<br/>
 
-# Sync Parse
-
-Perf Table
-
-![Image description](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/rghu4pqjmutcueudt81s.png)
-
-* TypeScript consistently outperforms the competition
+* TypeScript consistently outperforms the competitors
 * Native parsers show improved performance for larger files
 * Babel demonstrates unstable performance
+
+</div>
+</div>
 
 ---
 layout: center
@@ -434,24 +303,26 @@ layout: center
 
 # Async Parse
 
-Perf Chart
+* performance is calcuated as _operations per second_
+* _Fastest_ parser has _100%_ score, others have percentages of the fastest parser's score
+
+<div grid="~ cols-5 gap-4">
+<div col="span-3">
 
 ![Image description](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/vnyust8234v4y1vtsm6q.png)
 
----
-transition: slide-up
----
 
-# Async Parse
+</div>
+<div col="span-2">
+<br/>
+<br/>
 
-Perf Table
-
-![Image description](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/xs8ve7oelccjcrh1lbdj.png)
-
-* ast-grep excels when handling multiple medium to large files concurrently
-* TypeScript and Tree-sitter experience a decline in performance with larger files
+* ast-grep won when parsing medium to large files concurrently
+* TypeScript/Tree-sitter experience a decline in performance with larger files
 * SWC and Oxc maintain consistent performance
 
+</div>
+</div>
 
 ---
 
@@ -479,16 +350,6 @@ In essence, benchmarking a parser involves measuring the time for the actual par
 
 Understanding these elements helps us evaluate the efficiency and scalability of the parser in question.
 -->
-
----
-
-# Result Interpretation
-
-We will interpret the results in the following order
-
-* FFI Overhead
-* Serde Overhead
-* Parallel Parsing
 
 ---
 layout: two-cols
@@ -643,121 +504,6 @@ transition: slide-up
 
 * Native parsers can be parallel, while JS parsers cannot
 
----
-
-# Discussion
-
-### Why the benchmark shows Rust is slow?
-
-<v-clicks>
-
-* Native JS compilers are famous for their transformation speed
-
-* But Transformation and Parsing are different!
-
-<div grid="~ cols-2 gap-2">
-<div>
-Transform:
-Source -> Rust Data -> Transformed
-```rs
-"2 ** 3"  // source string
-/** PARSE **/
-BinaryOp { // Rust Data
-    left: Num(2), right: Num(3), op: **
-}
-/** GENERATE **/
-"Math.pow(2, 3)" // Transformed String
-```
-
-</div>
-<div>
-Parse: Source -> Rust Data -> JS Data
-
-```rs
-"2 ** 3"  // source string
-/** PARSE **/
-BinaryOp { // Rust Data
-    left: Num(2), right: Num(3), op: "**"
-}
-/** CONVERT TO JS **/
-var ast = { type: 'BinaryOp', left: 2, right: 3, op: '**'}
-```
-</div>
-</div>
-
-
-* Passing Rust data to JavaScript is a complex task
-</v-clicks>
-
----
-
-# Other Compilers
-
-What about XX parsers? Why are they not included?
-
-In our benchmark, we focused on parsers that offer a JavaScript API.
-
-* **Esbuild**
-  * Primarily used as a bundler
-  * Can transform and build JS app but
-  * [Does not expose AST](https://esbuild.github.io/api/#js-details) to JavaScript
-* **Biome**: A CLI application without a JavaScript API
-* **Sucrase**
-  * No parsing API
-  * [Unable to produce a complete AST](https://github.com/alangpierce/sucrase#motivation)
-* **Esprima**: lacks TypeScript support
-
-
----
-
-# JS Parsers
-
-## Babel
-- Babel has two main packages: `@babel/core` and `@babel/parser`
-- `@babel/core` is slower `@babel/parser`
-- `parseAsync` in Babel is not genuinely async
-- it's a sync parser method wrapped in an async function
-- Babel's performance is not stable
-
-## TypeScript
-- TSC parses pretty fast!
-- Bottleneck for TSC is type checking
-
----
-
-# Native Parser Review
-
-<v-click>
-
-#### SWC
-- Offers a broad range of APIs. A top choice for Rust tooling
-- Has some inherent overhead, though
-
-</v-click>
-
-<v-click>
-
-#### Oxc
-- Probably the fastest parser available
-- Speed is tempered by serde, as we use `JSON.parse` to reflect real-world usage
-
-</v-click>
-<v-click>
-
-#### Tree-sitter
-- A general parser for many languages, not optimized for TypeScript
-- Raw speed aligns closely with that of Babel
-- Rust parser is not faster by default, even without N-API overhead :)
-
-</v-click>
-
-<v-click>
-
-#### ast-grep
-- Powered by tree-sitter, but slightly faster
-- Maybe napi.rs is a faster binding than manual using C++ [nan.h](https://github.com/tree-sitter/node-tree-sitter/blob/master/src/parser.h)
-
-</v-click>
 
 ---
 layout: two-cols
@@ -803,104 +549,6 @@ napi_status NAPI_CDECL napi_create_async_work(...) {
 </div>
 
 ---
-
-# Future Outlook
-
-Several promising avenues can further refine Rust performance
-
-- **Minimize Serde Overhead**
-  - We can reduce the performance toll these operations take
-
-- **Harness Multi-core Capabilities**
-  - Effective utilization of multi-core can lead to substantial gains in speed
-- **Promote AST Reusability**
-  - Reuse AST within JavaScript can diminish the frequency of costly parsing
-- **Shift Workloads to Rust**
-  - Creating a DSL for AST could shift a great portion of work to the Rust side
-
----
-transition: slide-left
-clicks: 3
----
-
-# Future Outlook, Take One
-
-
-<div grid="~ cols-2 gap-4">
-<div>
-
-<v-click>
-
-A proof of concept implementation of passing binary AST to JavaScript.
-
-</v-click>
-
-<v-click>
-
-JavaScript can selectively read flexbuffers-based AST nodes on demand to avoid the deserialization toll.
-
-</v-click>
-
-<v-click>
-
-***
-
-Preliminary results, for reference only.
-
-```
-~ node test_buffer.js
-testJSON: 4.043s
-testBuffer: 2.395s
-```
-
-Buffer based API is 100% faster than JSON.
-
-https://github.com/oxc-project/oxc/pull/1680
-
-</v-click>
-
-</div>
-<div>
-
-<div v-click=[1,4]>
-
-```rust {7-9}
-#[napi]
-pub fn parse_sync_buffer(
-    source_text: String, options: Option<ParserOptions>
-) -> Buffer {
-    let options = options.unwrap_or_default();
-    let allocator = Allocator::default();
-    let ret = parse(&allocator, &source_text, &options);
-    let mut serializer = FlexbufferSerializer::new();
-    ret.program.serialize(&mut serializer).unwrap();
-    serializer.take_buffer().into()
-}
-```
-
-</div>
-
-<br/>
-
-<div v-click=[2,4]>
-
-```js {2,3}
-function testBuffer() {
-  const buffer = oxc.parseSyncBuffer(file);
-  const ref = flexbuffers.toReference(buffer.buffer);
-  assert(ref.isMap());
-  assert.equal(ref.get('type').stringValue(), 'Program');
-  const body = ref.get('body');
-  assert(body.isVector());
-}
-```
-
-</div>
-
-</div>
-</div>
-
----
 layout: image-right
 image: https://source.unsplash.com/collection/94734566/1920x1080
 ---
@@ -909,7 +557,7 @@ image: https://source.unsplash.com/collection/94734566/1920x1080
 
 <br/>
 
-### Thank [zaozao.run](https://www.zaozao.run) and [rustcc.cn](http://rustcc.cn/) for sponsoring this event!
+### Thank [Seattle.JS](https://www.zaozao.run)
 
 
 * If you find this talk helpful, please [give it a star](https://github.com/ast-grep/ast-grep) and share it with your friends!
