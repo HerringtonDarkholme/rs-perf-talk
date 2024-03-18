@@ -86,98 +86,21 @@ A brief intro, won't be long
 
 ---
 transition: fade-out
----
-
-# Rust in JavaScript
-
-**Rust** is rapidly becoming a language of choice within the JavaScript ecosystem
-
-- **Rspack** - Webpack
-- **Biome** - Prettier/Eslint
-- **Swc** - Babel
-- **Oxc** - Babel/Eslint
-- **Lightening CSS** - PostCSS
-- **Rolldown** - Rollup
-- **Tauri** - Electron
-- **Turbopack** - For Next.js
-
-<style>
-</style>
-
-<!--
-Here is another comment.
--->
-
----
-layout: two-cols
----
-
-# Rust Pros & Cons
-
-## Why Rust?
-
-<v-click>
-
-- ### Peak Performance
-  - Better Compiler Optimization
-  - Compact Data Layout
-  - Multiple Threads
-  - Powerful Low-level Intrinsics
-- ### Predictable Performance
-  - No Garbage Collection
-  - No JIT deoptimization
-- ### Great Ecosystem
-  - Cargo, Crates.io, napi.rs
-
-</v-click>
-
-::right::
-
-<br/>
-<br/>
-
-## Why Not Rust?
-
-<v-click>
-
-- ## Learning Curve
-  - Lifetime
-  - Borrow Checker
-  - Unsafe Rust
-
-- ## Distribute Plugins is Hard
-  - Either statically compile all plugins in binary
-  - Or design stable application binary interface
-
-- ## Fewer External Contributions
-  - Harder to learn
-
-</v-click>
-
-<!--
-- Compact Data Layout: less cache miss / fewer instructions
-- Powerful Low-level Intrinsics, e.g. SIMD / System Calls
--->
-
----
 layout: image-right
 image: /ast.jpg
 ---
 
-# Benchmark Parsers!
+# Rust in JavaScript
 
-<br/>
-
-* ### JS plugin is more customizable and easier
-<br/>
-
-* ### JS plugin should understand and change the code
-<br/>
-
-* ### One critical task is parsing JS/TS code
-<br/>
-
-* ### Our topic today is to benchmark parsers!
+- **Rust** is becoming the native choice in JS world
+- Why (Not)?
+  - Pros: Predictably Fast. Great Ecosystem.
+  - Cons: Learning cost. Fewer contributors. Hard to design **plugins**.
+- We need JS plugin!
+  - More customizable and easier to use
+  - It should understand and change code
+- One critical task is parsing JS/TS code
+- Our topic today is to benchmark parsers!
 
 ---
 transition: slide-up
