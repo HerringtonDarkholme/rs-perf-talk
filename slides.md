@@ -76,8 +76,8 @@ A brief intro, won't be long
 * ⚒️ And a web-dev-tool dev
 * 💻 Enjoys TypeScript and Rust
 * 🚀 The author of [ast-grep](https://ast-grep.github.io/)
+* 📰 [Twitter](https://twitter.com/hd_nvim)
 * 🐙 [GitHub](https://github.com/HerringtonDarkholme)
-* 📰 [Medium](https://medium.com/@hchan_nvim)
 
 ::right::
 
@@ -251,7 +251,7 @@ layout: center
 
 # Parse Time Breakdown
 
-NAPI time can be dissected into three main components
+native parse time can be dissected into three main components
 
 <h1>
 
@@ -447,7 +447,7 @@ How can we make Rust binding faster?
 
 - **Use multiple CPU cores**
 
-  - NAPI can use `AsyncTask` for multi-cores
+  - Native code can use `AsyncTask` for multi-cores
   - `AsyncTask` is scheduled on [libuv threads](http://docs.libuv.org/en/v1.x/threadpool.html)
   - libuv thread pool size is set to four by default
   - [Expand thread pool size](https://dev.to/bleedingcode/increase-node-js-performance-with-libuv-thread-pool-5h10) can improve perf
