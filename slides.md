@@ -442,8 +442,9 @@ How can we make Rust binding faster?
 - **Avoid Serde Cost at beginning**
 
   - Return a Rust object wrapper to Node.js
-  - Can lead to slower AST access in JS
-  - The cost is amortized over the reading phase
+  - It can lead to slower AST access in JS
+  - If only specific nodes are needed
+  - We can avoid unused whole tree serde
 
 - **Use multiple CPU cores**
 
