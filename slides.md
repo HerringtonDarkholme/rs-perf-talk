@@ -481,7 +481,7 @@ image: https://source.unsplash.com/collection/94734566/1920x1080
 
 <br/>
 
-### Thank [Seattle.JS](https://seattlejs.com/)
+### Thank [JS Nation](https://jsnation.us/)
 
 
 * If you find this talk helpful, please [give it a star](https://github.com/ast-grep/ast-grep) and share it with your friends!
