@@ -390,7 +390,7 @@ layout: two-cols
 
 * JS parsers are slower when parsing concurrently
 
-* They are CPU bounded because files must be parsed one by one on main the thread
+* They are CPU bounded because files must be parsed one by one on the main thread
 
 * Almost all native TS parsers have parallel support, except tree-sitter
 
