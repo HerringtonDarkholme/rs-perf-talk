@@ -329,7 +329,8 @@ Unfortunately, we failed to replicate swc/oxc's blazing performance we witnessed
 
 * swc/oxc is slower than TSC
   * Caused by calling [`JSON.parse` on strings](https://github.com/swc-project/swc/blob/5d944185187402691292fdb73ea767bd580e2a52/node-swc/src/index.ts#L108)
-  * Sending RS data is even slower than JSON
+  * Rust data cannot be shared by JS
+  * Whole AST is packed into JSON and sent to JS
 * Tree-sitter/ast-grep avoid serde overhead
   * By [returning a tree object](https://github.com/ast-grep/ast-grep/blob/1c3accfd7dccef293c480951759b86c418cde977/crates/napi/src/sg_node.rs#L297)
   * Tree nodes access requires [invoking Rust methods](https://github.com/ast-grep/ast-grep/blob/1c3accfd7dccef293c480951759b86c418cde977/crates/napi/src/sg_node.rs#L78) from JS
@@ -390,11 +391,13 @@ layout: two-cols
 
 * JS parsers are slower when parsing concurrently
 
-* They are CPU bounded because files must be parsed one by one on the main thread
+* JS is single-threaded, and parsing is CPU bounded
 
-* Almost all native TS parsers have parallel support, except tree-sitter
+* Files must be  one by one on the main thread
 
-* Native will not parse more four files at the same time
+* Almost all native parsers have parallel support, except tree-sitter
+
+<!-- * Native will not parse more four files at the same time -->
 
 ---
 
