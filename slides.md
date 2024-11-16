@@ -281,14 +281,14 @@ clicks: 3
 
 ::right::
 
-<arrow v-click="[1, 2]" x1="170" y1="10" x2="170" y2="60" color="#564" width="2" arrowSize="1" />
-<arrow v-click="[1, 2]" x1="170" y1="420" x2="170" y2="370" color="#564" width="2" arrowSize="1" />
+<arrow v-click="[1, 2]" x1="170" y1="10" x2="170" y2="60" color="#9bc" width="2" arrowSize="1" />
+<arrow v-click="[1, 2]" x1="170" y1="420" x2="170" y2="370" color="#9bc" width="2" arrowSize="1" />
 
-<arrow v-click="[2, 3]" x1="270" y1="10" x2="170" y2="60" color="#564" width="2" arrowSize="1" />
-<arrow v-click="[2, 3]" x1="300" y1="10" x2="400" y2="60" color="#564" width="2" arrowSize="1" />
+<arrow v-click="[2, 3]" x1="270" y1="10" x2="170" y2="60" color="#9bc" width="2" arrowSize="1" />
+<arrow v-click="[2, 3]" x1="300" y1="10" x2="400" y2="60" color="#9bc" width="2" arrowSize="1" />
 
-<arrow v-click="[3, 4]" x1="230" y1="180" x2="180" y2="90" color="#564" width="2" arrowSize="1" />
-<arrow v-click="[3, 4]" x1="230" y1="370" x2="180" y2="280" color="#564" width="2" arrowSize="1" />
+<arrow v-click="[3, 4]" x1="230" y1="180" x2="180" y2="90" color="#9bc" width="2" arrowSize="1" />
+<arrow v-click="[3, 4]" x1="230" y1="370" x2="180" y2="280" color="#9bc" width="2" arrowSize="1" />
 
 <br/>
 
@@ -375,7 +375,7 @@ layout: two-cols
 
 * JS is single-threaded, and parsing is CPU bounded
 
-* Files must be  one by one on the main thread
+* Files must be parsed one by one on the main thread
 
 * Almost all native parsers have parallel support, except tree-sitter
 
