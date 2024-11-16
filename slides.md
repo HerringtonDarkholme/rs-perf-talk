@@ -14,7 +14,7 @@ drawings:
 transition: fade
 title: Benchmark Rusty Parsers
 mdc: true
-colorSchema: 'light'
+colorSchema: 'dark'
 
 ---
 
