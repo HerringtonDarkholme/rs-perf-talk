@@ -43,24 +43,6 @@ The last comment block of each slide will be treated as slide notes. It will be 
 -->
 
 ---
-transition: fade
-layout: image
-image: /splash-white.png
----
-
----
-transition: fade
-layout: image
-image: /splash.png
----
-
-<style>
-.slidev-page-3.fade-enter-active {
-    transition-duration: 3s !important;
-}
-</style>
-
----
 transition: fade-out
 layout: two-cols
 ---
